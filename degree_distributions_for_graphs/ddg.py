@@ -11,4 +11,8 @@ def make_complete_graph(num_nodes):
 
 print make_complete_graph(5)
 
-             
+def compute_in_degrees(digraph):
+    pass
+
+def in_degree_distribution(digraph):
+    pass
