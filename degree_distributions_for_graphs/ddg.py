@@ -1,4 +1,5 @@
 """ Degree distributions for graphs """
+import random
 
 EX_GRAPH0 = {0:set([1,2]), 1:set([]),2:set([])}
 
@@ -14,6 +15,16 @@ def make_complete_graph(num_nodes):
     for idx1 in xrange(num_nodes):
         graph[idx1] = set([idx2 for idx2 in xrange(num_nodes) if idx2 != idx1])
     return graph
+
+def make_complete_graph_p(num_nodes, p):
+    """ returns a dictionary corresponding to a complete directed graph with the specified number of nodes """
+    graph = {}
+    for idx1 in xrange(num_nodes):
+        graph[idx1] = set([idx2 for idx2 in xrange(num_nodes) if idx2 != idx1 and random.random() < p])
+    return graph
+
+
+
 
 #print make_complete_graph(5)
 
@@ -40,6 +51,15 @@ def in_degree_distribution(digraph):
         graph.setdefault(deegree, 0)
         graph[deegree] += 1
     return graph
+
+def norm_degree_distribution(deg_distr):
+    sum_val = sum(deg_distr.values())
+    return dict([(node*1.0, deg_distr[node]*1.0/sum_val) for node in deg_distr])
+
+
+
+    
+
 
 #print in_degree_distribution(EX_GRAPH2)
     
