@@ -1,7 +1,7 @@
 import ddg, math
 import matplotlib.pyplot as plt
 
-er_graph = ddg.make_complete_graph_p(10000, 0.2)
+er_graph = ddg.make_complete_graph_p(100, 0.5)
 in_degre_distrib = ddg.in_degree_distribution(er_graph)
 norm_in_degre_distr = ddg.norm_degree_distribution(in_degre_distrib)
 graph = in_degre_distrib
