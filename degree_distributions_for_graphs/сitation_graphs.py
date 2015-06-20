@@ -32,13 +32,19 @@ def load_graph(graph_url):
 citation_graph = load_graph(CITATION_URL)
 in_degre_distrib = ddg.in_degree_distribution(citation_graph)
 norm_degree_distr = ddg.norm_degree_distribution(in_degre_distrib)
-graph = in_degre_distrib
-mx = sum([x*1.0*graph[x] for x in graph])/sum(graph.values())
-sigma = (sum([(x - mx)**2 for x in graph])/len(graph.values()))**0.5
-print mx, sigma, len(citation_graph)
+norm1 =  [(x, in_degre_distrib[x]) for x in in_degre_distrib]
+norm1.sort()
+norm = map(lambda x: (math.log10(x[0]),x[1]) if x[0] else (x[0],x[1]), norm1)
+norm = map(lambda x: (x[0], math.log10(x[1])) if x[1] else (x[0],x[1]), norm) 
+graph = norm
+mx = sum([x[0]*1.0*x[1] for x in graph])/sum([y[1] for y in graph])
+sigma = (sum([(x[0] - mx)**2 for x in graph])/len(graph))**0.5
+print mx, sigma, len(citation_graph), sum([y[1] for y in graph])
+arry = mlab.normpdf(np.array([x[0] for x in norm]), mx, sigma)
 
+plt.loglog([x[0] for x in norm1], arry)
+#pltloglog(norm_degree_distr.keys(), norm_degree_distr.values(), 'o')
 
-plt.loglog(norm_degree_distr.keys(), norm_degree_distr.values(), 'o')
 plt.title('loglog plot of Citation normalized in-degree distribution')
 plt.xlabel('in-degree')
 plt.ylabel('normalized distribution')
