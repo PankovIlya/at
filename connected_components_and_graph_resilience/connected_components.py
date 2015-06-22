@@ -3,6 +3,7 @@ import dsu as mdsu
 import data
 import urllib2
 import random
+import ..\degree_distributions_for_graphs\ddg.py as ddg
 
 def bfs_visited(ugraph, start_node):
     """ Algorithm BFS-Visited """
@@ -39,7 +40,7 @@ def largest_cc_size(ugraph):
         return 0
 
 def compute_resilience (ugraph, attack_order):
-    """ graph resilience """
+    """ graph resilience with DSU O(n+m) """
     rgraph = {}
     agraph = []
 
@@ -70,13 +71,23 @@ def compute_resilience (ugraph, attack_order):
 
     return  dcc
 
-def compute_resilience2 (ugraph, attack_order):
-    """ graph resilience """
+def copy_graph(graph):
+    """
+    Make a copy of a graph
+    """
+    new_graph = {}
+    for node in graph:
+        new_graph[node] = set(graph[node])
+    return new_graph
 
-    ccs = [largest_cc_size(ugraph)]
+def compute_resilience2 (ugraph, attack_order):
+    """ graph resilience O(n(n+m)) """
+
+    cgraph = copy_graph(ugraph)
+    ccs = [largest_cc_size(cgraph)]
     for node in attack_order:
-        del ugraph[node]
-        ccs += [largest_cc_size(ugraph)]
+        del cgraph[node] 
+        ccs += [largest_cc_size(cgraph)]
 
     return ccs
 

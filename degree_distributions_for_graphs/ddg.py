@@ -23,6 +23,13 @@ def make_complete_graph_p(num_nodes, p):
         graph[idx1] = set([idx2 for idx2 in xrange(num_nodes) if idx2 != idx1 and random.random() < p])
     return graph
 
+def make_complete_ugraph_p(num_nodes, p):
+    """ returns a dictionary corresponding to a complete directed graph with the specified number of nodes """
+    graph = {}
+    for idx1 in xrange(num_nodes):
+        graph[idx1] = set([idx2 for idx2 in xrange(num_nodes) if idx2 != idx1 and random.random() < p])
+    return graph
+
 
 
 
