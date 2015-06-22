@@ -1,76 +1,8 @@
 """ Connected components and graph resilience """
-#import dsu
-#import data
+import dsu as mdsu
+import data
 import urllib2
 import random
-
-class DSU (object):
-    """ disjoint-set data structure """
-    
-    def __init__(self):
-        """ init """
-        self._dsu = {}
-        self._head = {}
-        self._count = 0
-
-    def cmax(self, cnt):
-        """ check max count """
-        if self._count < cnt:
-            self._count = cnt
-
-    def count(self):
-        """ count set connected components """
-        return self._count
-
-    def make(self, node):
-        """ set head """
-        self._dsu[node] = node
-        self._head[node] = 1
-        self.cmax(self._head[node])
-
-    def add(self, node, parent):
-        """ add node """ 
-        self._dsu[node] = parent
-        self._head[parent] = +1
-        self.cmax(self._head[parent])
-          
-    def find(self, node):
-        """ find head on node """
-        if node not in self._dsu:
-            return None
-        
-        return self._find(node)
-
-    def _find(self, node):
-        """ find head on node """
-        if self._dsu[node] == node:
-            return node
-        else:
-            return self._find(self._dsu[node])
-
-
-    def join(self, node1, node2):
-        """ join two cc """
-        head1 = self.find(node1)
-        head2 = self.find(node2)
-
-        #print 'head1', head1, 'head2', head2, 'dsu', self._dsu 
-        
-        if head1 == head2:
-            return head1
-        
-        if random.randint(0,1):
-            tmp = head1
-            head1 = head2
-            head2 = tmp
-
-        self._dsu[head2] = head1
-        self._head[head1] += self._head[head2]
-        del self._head[head2]
-        self.cmax(self._head[head1])
-        
-        return head1
-
 
 def bfs_visited(ugraph, start_node):
     """ Algorithm BFS-Visited """
@@ -116,15 +48,15 @@ def compute_resilience (ugraph, attack_order):
             rgraph[node] = ugraph[node]
         
     agraph = reduce(lambda graph, node : [node] + graph, attack_order, [])
-
       
     scc = cc_visited(rgraph)
-    dsu = DSU()
+    dsu = mdsu.DSU()
     for nodes in scc:
        head = nodes.pop() 
        dsu.make(head)
        while nodes: 
            dsu.add(nodes.pop(), head)
+
 
     dcc = [dsu.count()]
     for anode in agraph:
@@ -149,8 +81,6 @@ def compute_resilience2 (ugraph, attack_order):
     return ccs
 
 
-NETWORK_URL = "http://storage.googleapis.com/codeskulptor-alg/alg_rf7.txt"
-
 
 def load_graph(graph_url):
     """
@@ -159,7 +89,8 @@ def load_graph(graph_url):
     
     Returns a dictionary that models a graph
     """
-    graph_file = urllib2.urlopen(graph_url)
+    #graph_file = urllib2.urlopen(graph_url)
+    graph_file = open("ccdata.txt")
     graph_text = graph_file.read()
     graph_lines = graph_text.split('\n')
     graph_lines = graph_lines[ : -1]
@@ -176,12 +107,15 @@ def load_graph(graph_url):
 
     return answer_graph
 
-NETWORK_URL = "http://storage.googleapis.com/codeskulptor-alg/alg_rf7.txt"
-ugraph = load_graph(NETWORK_URL)
+if __name__ == "__main__":
+    net_url = "http://storage.googleapis.com/codeskulptor-alg/alg_rf7.txt"
+    cr = compute_resilience(data.GRAPH2, [1, 3, 5, 7, 2, 4, 6, 8])
+    assert ( cr ==  [8, 7, 6, 5, 1, 1, 1, 1, 0])
+    ugraph = load_graph(net_url)
+    print 'LOAD'
+    atack = set([random.choice(ugraph.keys()) for _ in xrange(len(ugraph)//3)])
+    assert (compute_resilience(ugraph, atack) == compute_resilience2(ugraph, atack))
 
-print 'LOAD'
-print compute_resilience2(ugraph, [22, 50, 114, 136, 210, 4, 6, 8])
-#(alg_module2_graphs.GRAPH2, [1, 3, 5, 7, 2, 4, 6, 8]) expected [8, 7, 6, 5, 1, 1, 1, 1, 0]
-
+    
 
 
