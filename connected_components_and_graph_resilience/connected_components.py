@@ -50,9 +50,9 @@ def compute_resilience (ugraph, attack_order):
         del rgraph[node]
         
     agraph = attack_order[::-1] 
-    print 'start bfs'  
+    print "start bfs"
     scc = cc_visited(rgraph)
-    print 'removed graph complete'
+    print "create dsu"
     dsu = mdsu.DSU()
     for nodes in scc:
        head = nodes.pop() 
@@ -60,7 +60,7 @@ def compute_resilience (ugraph, attack_order):
        while nodes: 
            dsu.add(nodes.pop(), head)
 
-
+    print "start resilience"
     dcc = [dsu.count()]
     for anode in agraph:
         nodes = ugraph[anode]
@@ -129,6 +129,8 @@ if __name__ == "__main__":
     ugraph = load_graph(net_url)
     print 'LOAD'
     atack = set([random.choice(ugraph.keys()) for _ in xrange(len(ugraph)//3)])
+    atack = [x for x in atack]
+    random.shuffle(atack)
     assert (compute_resilience(ugraph, atack) == compute_resilience2(ugraph, atack))
 
     

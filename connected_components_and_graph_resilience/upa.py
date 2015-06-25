@@ -1,5 +1,4 @@
 import random, ddg, math
-import matplotlib.pyplot as plt
 
 
 class UPATrial:
