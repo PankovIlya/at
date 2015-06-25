@@ -2,62 +2,73 @@ import random, ddg, math
 import matplotlib.pyplot as plt
 
 
-class DPATrial:
+class UPATrial:
     """
-    Simple class to encapsulate optimized trials for DPA algorithm
+    Simple class to encapsulate optimizated trials for the UPA algorithm
+    
+    Maintains a list of node numbers with multiple instance of each number.
+    The number of instances of each node number are
+    in the same proportion as the desired probabilities
+    
+    Uses random.choice() to select a node number from this list for each trial.
     """
 
     def __init__(self, num_nodes):
         """
-        Initialize a DPATrial object corresponding to a 
+        Initialize a UPATrial object corresponding to a 
         complete graph with num_nodes nodes
+        
+        Note the initial list of node numbers has num_nodes copies of
+        each node number
         """
         self._num_nodes = num_nodes
         self._node_numbers = [node for node in range(num_nodes) for dummy_idx in range(num_nodes)]
 
+
     def run_trial(self, num_nodes):
         """
-        Conduct num_node trials using by applying random.choice()
+        Conduct num_nodes trials using by applying random.choice()
         to the list of node numbers
+        
+        Updates the list of node numbers so that each node number
+        appears in correct ratio
+        
+        Returns:
+        Set of nodes
         """
+        
+        # compute the neighbors for the newly-created node
         new_node_neighbors = set()
         for _ in range(num_nodes):
             new_node_neighbors.add(random.choice(self._node_numbers))
-
+        
+        # update the list of node numbers so that each node number 
+        # appears in the correct ratio
         self._node_numbers.append(self._num_nodes)
+        for dummy_idx in range(len(new_node_neighbors)):
+            self._node_numbers.append(self._num_nodes)
         self._node_numbers.extend(list(new_node_neighbors))
         
+        #update the number of nodes
         self._num_nodes += 1
         return new_node_neighbors
 
 
 
-def dpa(m, n):
-    graph = ddg.make_complete_graph(m)
-    in_dpa = DPATrial(m)
+def upa(m, n):
+    graph = ddg.make_complete_ugraph_p(m,1)
+    in_dpa = UPATrial(m)
 
     for idx in xrange(m, n):
-        graph[idx] = in_dpa.run_trial(m)     
+        nodes = in_dpa.run_trial(m)  
+        graph[idx] = nodes
+        for node in nodes:
+            graph.setdefault(node, set([]))
+            graph[node].add(idx)
             
     return graph
 
-if __name__ == "__main__":
 
-    graph = dpa(13,28000)
-    g = ddg.compute_in_degrees(graph)
-    print sum([g[x] for x in xrange(13)])/12
-    
-    in_degre_distrib = ddg.in_degree_distribution(graph)
-    norm_degree_distr = ddg.norm_degree_distribution(in_degre_distrib)
-    graph = in_degre_distrib
-    mx = sum([x*1.0*graph[x] for x in graph])/sum(graph.values())
-    sigma = (sum([(x - mx)**2 for x in graph])/len(graph.values()))**0.5
-    print mx, sigma
-    plt.loglog(norm_degree_distr.keys(), norm_degree_distr.values(), 'o')
-    plt.title('loglog plot of DPA normalized in-degree distribution, n = 28000, m = 13')
-    plt.xlabel('in-degree')
-    plt.ylabel('normalized distribution')
-    plt.show()
 
     
 

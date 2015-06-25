@@ -3,7 +3,7 @@ import dsu as mdsu
 import data
 import urllib2
 import random
-import ..\degree_distributions_for_graphs\ddg.py as ddg
+
 
 def bfs_visited(ugraph, start_node):
     """ Algorithm BFS-Visited """
@@ -118,8 +118,10 @@ def load_graph(graph_url):
 
     return answer_graph
 
+net_url = "http://storage.googleapis.com/codeskulptor-alg/alg_rf7.txt"
+
 if __name__ == "__main__":
-    net_url = "http://storage.googleapis.com/codeskulptor-alg/alg_rf7.txt"
+    
     cr = compute_resilience(data.GRAPH2, [1, 3, 5, 7, 2, 4, 6, 8])
     assert ( cr ==  [8, 7, 6, 5, 1, 1, 1, 1, 0])
     ugraph = load_graph(net_url)
