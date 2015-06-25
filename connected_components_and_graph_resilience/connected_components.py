@@ -43,14 +43,16 @@ def compute_resilience (ugraph, attack_order):
     """ graph resilience with DSU O(n+m) """
     rgraph = {}
     agraph = []
+    
+    rgraph = copy_graph(ugraph)             
 
-    for node in ugraph:
-        if node not in attack_order:
-            rgraph[node] = ugraph[node]
+    for node in set(attack_order):
+        del rgraph[node]
         
-    agraph = reduce(lambda graph, node : [node] + graph, attack_order, [])
-      
+    agraph = attack_order[::-1] 
+    print 'start bfs'  
     scc = cc_visited(rgraph)
+    print 'removed graph complete'
     dsu = mdsu.DSU()
     for nodes in scc:
        head = nodes.pop() 

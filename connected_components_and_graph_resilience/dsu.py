@@ -39,10 +39,10 @@ class DSU (object):
 
     def _find(self, node):
         """ find head on node """
-        if self._dsu[node] == node:
-            return node
-        else:
-            return self._find(self._dsu[node])
+        while self._dsu[node] != node:
+            node = self._dsu[node]
+
+        return node
 
 
     def join(self, node1, node2):
