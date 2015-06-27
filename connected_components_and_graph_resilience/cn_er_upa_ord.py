@@ -27,30 +27,22 @@ atack2 = fto.fast_targeted_order(er_ugraph)
 er_cr =cc.compute_resilience(er_ugraph, atack2)
 
 #upa 
-upa_graph = mupa.upa(int(mx), cnt)
+upa_graph = mupa.upa(int(mx), cnt) 
 atack3 = fto.fast_targeted_order(upa_graph)
 upa_cr =cc.compute_resilience(upa_graph, atack3)
 
-xcount = max([len(atack), len(atack2), len(atack3)])
+count = [x for x in xrange(len(cn_graph))]
 
 
-_, cnp =  plt.subplots()
-upap = cnp.twinx()
-erp = cnp.twinx()
-
-cnp.plot([x for x in xrange(len(atack))], cn_cr[1:], "r", label='Computer Network (CN)')
-erp.plot([x for x in xrange(len(atack2))], er_cr[1:], "b",  label='ER')
-upap.plot([x for x in xrange(len(atack3))], upa_cr[1:], "g", label='UPA')
+plt.plot(count, cn_cr[1:], "r", label='Computer Network (CN)')
+plt.plot(count, er_cr[1:], "b",  label='ER')
+plt.plot(count, upa_cr[1:], "g", label='UPA')
 
 title = 'Resilience of the graphs, with fast targeted order, n = {0} , p = {1}, m = {2}'.format(cnt, p, int(mx))
 plt.title(title)
 
-cnp.set_xlabel('number of removed nodes')
-cnp.set_ylabel('the size of the largest connected component, CN')
-erp.set_ylabel('the size of the largest connected component, ER, UPA')
-
-cnp.legend(loc='lower right')
-erp.legend(loc='center right')
-upap.legend(loc='upper right')
-erp.grid(True)
+plt.xlabel('number of removed nodes')
+plt.ylabel('the size of the largest connected component')
+plt.legend(loc='upper right')
+plt.grid(True)
 plt.show()

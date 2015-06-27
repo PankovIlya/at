@@ -1,6 +1,6 @@
 import connected_components as cc
 import sys
-sys.path.append('/home/ilya/Documents/at/degree_distributions_for_graphs')
+sys.path.append('../degree_distributions_for_graphs')
 import ddg
 import upa as mupa
 import math, random
@@ -27,7 +27,7 @@ er_ugraph = ddg.make_complete_ugraph_p(cnt, p)
 er_cr =cc.compute_resilience(er_ugraph, atack)
 
 #upa 
-upa_graph = mupa.upa(int(mx), cnt)
+upa_graph = mupa.upa(int(mx), cnt) # 
 upa_cr =cc.compute_resilience(upa_graph, atack)
 
 count = [x for x in xrange(len(atack))]

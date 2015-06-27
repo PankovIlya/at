@@ -20,7 +20,7 @@ def fast_targeted_order(ugraph):
         sdegree[cnt].add(node)
 
     rnodes = []    
-    for k in xrange(len(ugraph)-1, 0, -1):
+    for k in xrange(len(ugraph)-1, -1, -1):
         nodes = sdegree[k]
         while nodes:
             rnode = nodes.pop()
@@ -69,7 +69,7 @@ def time_run(ugraf, foo):
 
 if __name__ == "__main__":
     import sys
-    sys.path.append('/home/ilya/Documents/at/degree_distributions_for_graphs')
+    sys.path.append('../degree_distributions_for_graphs')
     import upa as mupa
     import matplotlib.pyplot as plt
  
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         cntx += [cnt]
         upa_graph = mupa.upa(5, cnt)
         toy += [time_run(upa_graph, targeted_order)]
-        ftoy += [time_run(upa_graph, fast_target_order)]
+        ftoy += [time_run(upa_graph, fast_targeted_order)]
 
     plt.plot(cntx, toy, "r", label='Target Order')
     plt.plot(cntx, ftoy, "g", label='Fast Target Order')
