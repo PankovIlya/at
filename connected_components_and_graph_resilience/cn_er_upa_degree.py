@@ -16,12 +16,10 @@ p = round(mx*1.0/cnt, 3)
 print mx, sum(graph.values())
 
 er_ugraph = ddg.make_complete_ugraph_p(cnt, mx*1.0/cnt)
-
-upa_graph = mupa.upa(int(mx), cnt)
-
-upa_degre_distr = ddg.degree_distribution(upa_graph)
 er_degre_distr = ddg.degree_distribution(er_ugraph)
 
+upa_graph = mupa.upa(int(mx), cnt)
+upa_degre_distr = ddg.degree_distribution(upa_graph)
 
 graph2 = er_degre_distr
 graph3 = upa_degre_distr

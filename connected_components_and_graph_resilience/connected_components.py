@@ -50,9 +50,7 @@ def compute_resilience (ugraph, attack_order):
         del rgraph[node]
         
     agraph = attack_order[::-1] 
-    print "start bfs"
     scc = cc_visited(rgraph)
-    print "create dsu"
     dsu = mdsu.DSU()
     for nodes in scc:
        head = nodes.pop() 
@@ -60,7 +58,6 @@ def compute_resilience (ugraph, attack_order):
        while nodes: 
            dsu.add(nodes.pop(), head)
 
-    print "start resilience"
     dcc = [dsu.count()]
     for anode in agraph:
         nodes = ugraph[anode]
@@ -82,7 +79,7 @@ def copy_graph(graph):
         new_graph[node] = set(graph[node])
     return new_graph
 
-def compute_resilience2 (ugraph, attack_order):
+def compute_resilience_simple (ugraph, attack_order):
     """ graph resilience O(n(n+m)) """
 
     cgraph = copy_graph(ugraph)
@@ -119,6 +116,22 @@ def load_graph(graph_url):
             answer_graph[node].add(int(neighbor))
 
     return answer_graph
+
+def renum_keys(ugraph):
+    ord_graph = {}
+    idx = 0 
+    res_graph = {}    
+    for node in ugraph:
+        ord_graph[node] = idx
+        idx += 1
+
+    for hnode in ugraph:
+        idx = ord_graph[hnode]
+        res_graph.setdefault(idx, set([]))
+        for cnode in ugraph[hnode]:
+            res_graph[idx].add(ord_graph[cnode])
+
+    return res_graph
 
 net_url = "http://storage.googleapis.com/codeskulptor-alg/alg_rf7.txt"
 
