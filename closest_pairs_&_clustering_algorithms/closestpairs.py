@@ -11,7 +11,7 @@ kmeans_clustering(cluster_list, num_clusters, num_iterations)
 where cluster_list is a 2D list of clusters in the plane
 """
 
-import math
+import math, random
 #import cluster as alg_cluster
 
 
@@ -143,16 +143,42 @@ def closest_pair_strip(clusters, horiz_center, half_width):
 ##                         alg_cluster.Cluster(set([]), 0.89, 0.28, 1, 0)])
 #expected one of the tuples in set([(0.30265491900843111, 0, 3)])
 
+
+comp = lambda cls1, cls2: 1 if cls1.horiz_center() > cls2.horiz_center() else ( -1 if cls1.horiz_center() < cls2.horiz_center() else 0)
+
+
+def insert_claster(clasters, foo, val):
+
+    if not clasters:
+        return [val]
+    else:
+        mid = len(clasters)//2
+        res = foo(clasters[mid], val)
+        if res == 1:
+            return insert_claster(clasters[:mid], foo, val) + clasters[mid:]
+        elif res == -1:
+            return clasters[:mid+1] + insert_claster(clasters[mid+1:], foo, val)
+        else:
+            return clasters[:mid] + [val] + clasters[mid:]
+        
+    
 def hierarchical_clustering(cluster_list, num_clusters):
     """
     Compute a hierarchical clustering of a set of clusters
     """
-    while len(cluster_list) > num_clusters:
-        min_cc = fast_closest_pair(cluster_list)
-        cluster_list[min_cc[1]].merge_clusters(cluster_list[min_cc[2]])
-        del cluster_list[min_cc[2]]
-    
-    return cluster_list
+    clusters = [cls.copy() for cls in cluster_list]
+    clusters.sort(key = lambda cls: cls.horiz_center())
+
+    while len(clusters) > num_clusters:
+        min_cc = fast_closest_pair(clusters)
+        cls = clusters[min_cc[1]].merge_clusters(clusters[min_cc[2]])
+        del clusters[min_cc[2]]
+        del clusters[min_cc[1]]
+        clusters = insert_claster(clusters, comp, cls)
+        #clusters.sort(key = lambda cls: cls.horiz_center())
+
+    return clusters
+
 
 
 ######################################################################
