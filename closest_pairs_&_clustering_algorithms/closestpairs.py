@@ -195,6 +195,20 @@ def kmeans_clustering(cluster_list, num_clusters, num_iterations):
     """
 
     # position initial clusters at the location of clusters with largest populations
+    clusters = [cls.copy() for cls in cluster_list]
+    cluster_list.sort(key = lambda cls: cls.total_population())
+
+    for idx in xrange(num_clusters):
+            clusters.append(cluster_list[idx].)
+
+    for _ xrange(num_iterations):
+
+        for idx in xrange(num_clusters):
+            clusters  clusters.pop(0)
+        
+    
             
     return []
+
+
 
