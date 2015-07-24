@@ -309,7 +309,7 @@ def gen_random_clusters(num_clusters):
 
     return clusters
 
-for _ in xrange(10):
+for nn in xrange(50):
 
     _clusters = gen_random_clusters(500)
     
@@ -318,15 +318,15 @@ for _ in xrange(10):
     gxclusters = sorted(_clusters, key = lambda cluster: cluster.horiz_center())
     gyclusters = sorted(_clusters, key = lambda cluster: cluster.vert_center())
 
-    print 'go'
+    print 'go' + str(nn)
     a = fast_closest_pair_new(gxclusters, gyclusters)
     b = fast_closest_pair(ogxclusters)
 
     #print a, b
     assert a[0] == b[0]
 
-    c = hierarchical_clustering_new(_clusters, 5)
-    d = hierarchical_clustering(_clusters, 5)
+    c = hierarchical_clustering_new(_clusters, 50)
+    d = hierarchical_clustering(_clusters, 50)
 
     for idx in xrange(len(c)):
         assert c[idx].fips_codes()^d[idx].fips_codes() == set([])   
