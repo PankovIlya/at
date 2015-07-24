@@ -10,8 +10,9 @@ kmeans_clustering(cluster_list, num_clusters, num_iterations)
 """
 
 import math, random
-#import cluster as alg_cluster
-import alg_cluster
+import cluster as cl
+from itertools import combinations
+
 
 
 
@@ -56,7 +57,7 @@ def fast_closest_pair(clusters):
         minr =  (minr[0], minr[1]+mid, minr[2]+mid)
         #print minl, minr 
         expect = min(minl, minr)
-        mid = abs(clusters[mid].horiz_center() + clusters[mid-1].horiz_center())/2.0
+        mid = (clusters[mid].horiz_center() + clusters[mid-1].horiz_center())/2.0
         #print mid           
         return min(expect, closest_pair_strip(clusters, mid, expect[0]))
 
@@ -92,60 +93,78 @@ def closest_pair_strip(clusters, horiz_center, half_width):
         idx1, idx2 = min(idx1, idx2), max(idx1, idx2)
         
     return (min_d[0], idx1, idx2)     
- 
-##print closest_pair_strip([alg_cluster.Cluster(set([]), 0, 0, 1, 0), alg_cluster.Cluster(set([]), 1, 0, 1, 0),
-##                           alg_cluster.Cluster(set([]), 2, 0, 1, 0), alg_cluster.Cluster(set([]), 3, 0, 1, 0)], 1.5, 1.0)
-##
-##
-##print closest_pair_strip([alg_cluster.Cluster(set([]), 1.0, 1.0, 1, 0), alg_cluster.Cluster(set([]), 1.0, 5.0, 1, 0),
-##                           alg_cluster.Cluster(set([]), 1.0, 4.0, 1, 0), alg_cluster.Cluster(set([]), 1.0, 7.0, 1, 0)], 1.0, 3.0)
 
-##print closest_pair_strip([alg_cluster.Cluster(set([]), 0.32, 0.16, 1, 0), alg_cluster.Cluster(set([]), 0.39, 0.4, 1, 0),
-##                          alg_cluster.Cluster(set([]), 0.54, 0.8, 1, 0),
-##                          alg_cluster.Cluster(set([]), 0.61, 0.8, 1, 0),
-##                          alg_cluster.Cluster(set([]), 0.76, 0.94, 1, 0)], 0.46500000000000002, 0.070000000000000007)
-##print closest_pair_strip([alg_cluster.Cluster(set([]), -4.0, 0.0, 1, 0),
-##                    alg_cluster.Cluster(set([]), 0.0, -1.0, 1, 0),
-##                    alg_cluster.Cluster(set([]), 0.0, 1.0, 1, 0),
-##                    alg_cluster.Cluster(set([]), 4.0, 0.0, 1, 0)], 0.0, 4.1231059999999999)
-## expected one of the tuples in set([(2.0, 1, 2)]) 
-
-#([(1.0, 1, 2)]) but received (1.0, 0, 1)    
-
-##print fast_closest_pair([alg_cluster.Cluster(set([]), 0, 0, 1, 0),
-##                         alg_cluster.Cluster(set([]), 1, 0, 1, 0),
-##                         alg_cluster.Cluster(set([]), 2, 0, 1, 0),
-##                         alg_cluster.Cluster(set([]), 3, 0, 1, 0)])
-
-#expected one of the tuples in set([(1.0, 1, 2), (1.0, 0, 1), (1.0, 2, 3)])
-
-##print fast_closest_pair([alg_cluster.Cluster(set([]), 0.32, 0.16, 1, 0),
-##                         alg_cluster.Cluster(set([]), 0.39, 0.4, 1, 0),
-##                         alg_cluster.Cluster(set([]), 0.54, 0.8, 1, 0),
-##                         alg_cluster.Cluster(set([]), 0.61, 0.8, 1, 0),
-##                         alg_cluster.Cluster(set([]), 0.76, 0.94, 1, 0)])
-
-#expected one of the tuples in set([(0.069999999999999951, 2, 3)])
-#but received (0.25, 0, 1)
+def slow_closest_pair_new(clusters):
+    """
+    Compute the distance between the closest pair of clusters in a list (slow)
+    """
+    return min(map(lambda cls: (cls[0].distance(cls[1]), cls[0], cls[1]), combinations(clusters, 2)))
 
 
-##print fast_closest_pair([alg_cluster.Cluster(set([]), 0.05, 0.11, 1, 0),
-##                         alg_cluster.Cluster(set([]), 0.26, 0.92, 1, 0),
-##                         alg_cluster.Cluster(set([]), 0.34, 0.57, 1, 0),
-##                         alg_cluster.Cluster(set([]), 0.35, 0.15, 1, 0),
-##                         alg_cluster.Cluster(set([]), 0.6, 0.41, 1, 0),
-##                         alg_cluster.Cluster(set([]), 0.89, 0.28, 1, 0)])
-#expected one of the tuples in set([(0.30265491900843111, 0, 3)])
+get_mid = lambda cls1, cls2 : (cls1.horiz_center() + cls2.horiz_center())/2.0
 
+def fast_closest_pair_new(xclusters, yclusters):
+    """
+    Compute the distance between the closest pair of clusters in a list (fast)
+    """
+    cnt = len(xclusters)
+
+    if cnt <= 3:
+        return slow_closest_pair_new(xclusters)
+    else:
+
+        mid = cnt/2
+        ys = [cls for cls in yclusters if cls.horiz_center() < xclusters[mid].horiz_center()]
+        xs = [cls for cls in yclusters if cls.horiz_center() >= xclusters[mid].horiz_center()]
+
+        minl = fast_closest_pair_new(xclusters[:mid], ys)
+        minr = fast_closest_pair_new(xclusters[mid:], xs)
+
+        expect = min(minl, minr)
+       
+        return min(expect, closest_pair_strip_new(xclusters, yclusters, get_mid(xclusters[mid-1], xclusters[mid]), expect[0]))
+
+def closest_pair_strip_new(xclusters, yclusters, horiz_center, half_width):
+    """
+    Helper function to compute the closest pair of clusters in a vertical strip
+    """
+                
+    def get_list(clusters):
+        """
+        helper foo
+        """
+        if not clusters:
+            return []
+        else:
+            return [(clusters[0].distance(cls), clusters[0], cls) for cls in clusters[1:4]] + get_list(clusters[1:])
+
+    def expect_list(clusters):
+        """
+        4 consecutive comparison. py is not haskell, but if you want...
+        """
+        cnt = len(clusters)
+        
+        if cnt <= 8:
+            return get_list(clusters)
+        else:
+            return expect_list(clusters[:cnt//2+4]) + expect_list(clusters[cnt//2:])
+
+
+    
+    clusters = [cls for cls in yclusters if abs(cls.horiz_center() - horiz_center) < half_width]
+    clusters = expect_list(clusters) 
+    clusters.append((float('inf'), None, None))
+        
+    return min(clusters)
 
 
 ######################################################################
 # Code for hierarchical clustering
 
-COMP = lambda cls1, cls2: 1 if cls1.horiz_center() > cls2.horiz_center() else ( -1 if cls1.horiz_center() < cls2.horiz_center() else 0)
+compx = lambda cls1, cls2: 1 if cls1.horiz_center() > cls2.horiz_center() else ( -1 if cls1.horiz_center() < cls2.horiz_center() else 0)
+compy = lambda cls1, cls2: 1 if cls1.vert_center() > cls2.vert_center() else ( -1 if cls1.vert_center() < cls2.vert_center() else 0)
 
-
-def insert_claster(clasters, cmpv, val):
+def insert_claster(clasters, foo, val):
     """
     helper foo, insert into sorted list
     """
@@ -153,11 +172,11 @@ def insert_claster(clasters, cmpv, val):
         return [val]
     else:
         mid = len(clasters)//2
-        res = cmpv(clasters[mid], val)
+        res = foo(clasters[mid], val)
         if res == 1:
-            return insert_claster(clasters[:mid], cmpv, val) + clasters[mid:]
+            return insert_claster(clasters[:mid], foo, val) + clasters[mid:]
         elif res == -1:
-            return clasters[:mid+1] + insert_claster(clasters[mid+1:], cmpv, val)
+            return clasters[:mid+1] + insert_claster(clasters[mid+1:], foo, val)
         else:
             return clasters[:mid] + [val] + clasters[mid:]
         
@@ -174,16 +193,38 @@ def hierarchical_clustering(cluster_list, num_clusters):
         cls = clusters[min_cc[1]].merge_clusters(clusters[min_cc[2]])
         del clusters[min_cc[2]]
         del clusters[min_cc[1]]
-        clusters = insert_claster(clusters, COMP, cls)
+        clusters = insert_claster(clusters, compx, cls)
         #clusters.sort(key = lambda cls: cls.horiz_center())
 
     return clusters
 
+def hierarchical_clustering_new(cluster_list, num_clusters):
+    """
+    Compute a hierarchical clustering of a set of clusters
+    """
+    xclusters = [cls.copy() for cls in cluster_list]
+    xclusters.sort(key = lambda cls: cls.horiz_center())
+    yclusters = sorted(xclusters, key = lambda cls: cls.vert_center())
+
+    while len(xclusters) > num_clusters:
+        min_cc = fast_closest_pair_new(xclusters, yclusters)
+        cls1, cls2 = min_cc[1], min_cc[2] 
+        new_cls = cls1.merge_clusters(cls2)
+
+        xclusters.remove(cls1)
+        xclusters.remove(cls2)
+        yclusters.remove(cls1)
+        yclusters.remove(cls2)
+        
+        xclusters = insert_claster(xclusters, compx, new_cls)
+        yclusters = insert_claster(yclusters, compy, new_cls)
+        
+    return xclusters
 
 ######################################################################
 # Code for k-means clustering
 
-class KCluster(alg_cluster.Cluster):
+class KCluster(cl.Cluster):
     """
     Child Class, main Cluster 
     """
@@ -191,12 +232,12 @@ class KCluster(alg_cluster.Cluster):
         """
         Create a cluster 
         """
-        alg_cluster.Cluster.__init__(self,
-                                     set(cluster.fips_codes()),
-                                         cluster.horiz_center(),
-                                         cluster.vert_center(),
-                                         cluster.total_population(),
-                                         cluster.averaged_risk())
+        cl.Cluster.__init__(self,
+                             set(cluster.fips_codes()),
+                                 cluster.horiz_center(),
+                                 cluster.vert_center(),
+                                 cluster.total_population(),
+                                 cluster.averaged_risk())
         self._center = (0, 0)
         self.init()
         self.update()
@@ -255,4 +296,44 @@ def kmeans_clustering(cluster_list, num_clusters, num_iterations):
             cluster.update()
 
     return clusters
+
+def gen_random_clusters(num_clusters):
+    """
+    gen random clusters
+    """
+    
+    clusters = []
+    
+    for num in xrange(num_clusters):
+        clusters.append(cl.Cluster(set([num]), random.uniform(-1,1), random.uniform(-1,1), 1, 0))
+
+    return clusters
+
+for _ in xrange(1):
+
+    _clusters = gen_random_clusters(50)
+    
+    ogxclusters = sorted(_clusters, key = lambda cluster: cluster.horiz_center())
+
+    gxclusters = sorted(_clusters, key = lambda cluster: cluster.horiz_center())
+    gyclusters = sorted(_clusters, key = lambda cluster: cluster.vert_center())
+
+    print 'go'
+    a = fast_closest_pair_new(gxclusters, gyclusters)
+    b = fast_closest_pair(ogxclusters)
+
+    #print a, b
+    assert a[0] == b[0]
+
+    c = hierarchical_clustering_new(_clusters, 5)
+    
+    d = hierarchical_clustering(_clusters, 5)
+    print c
+    print 'old'
+    print d
+
+
+
+ 
+
 
