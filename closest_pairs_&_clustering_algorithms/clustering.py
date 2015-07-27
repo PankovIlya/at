@@ -12,89 +12,14 @@ kmeans_clustering(cluster_list, num_clusters, num_iterations)
 import math, random
 import cluster as cl
 from itertools import combinations
-
+import old_clustering as old
 
 
 
 ######################################################
 # Code for closest pairs of clusters
 
-def pair_distance(clusters, idx1, idx2):
-    """
-    Helper function that computes Euclidean distance between two clusters in a list
-    """
-    return (clusters[idx1].distance(clusters[idx2]), min(idx1, idx2), max(idx1, idx2))
-
-
 def slow_closest_pair(clusters):
-    """
-    Compute the distance between the closest pair of clusters in a list (slow)
-    """
-    min_d = (float('inf'), -1, -1)
-    cnt = len(clusters)
-    for idx1 in xrange(cnt-1):
-        for idx2 in xrange(idx1+1, cnt):
-            min_d = min(min_d, pair_distance(clusters, idx1, idx2))
-            
-    return min_d
-
-
-
-def fast_closest_pair(clusters):
-    """
-    Compute the distance between the closest pair of clusters in a list (fast)
-    """
-    cnt = len(clusters)
-
-    if cnt <= 3:
-        return slow_closest_pair(clusters)
-    else:
-        mid = cnt//2
-        #print m
-        minl = fast_closest_pair(clusters[:mid])
-        minr = fast_closest_pair(clusters[mid:])
-        #print minl, minr
-        minr =  (minr[0], minr[1]+mid, minr[2]+mid)
-        #print minl, minr 
-        expect = min(minl, minr)
-        mid = (clusters[mid].horiz_center() + clusters[mid-1].horiz_center())/2.0
-        #print mid           
-        return min(expect, closest_pair_strip(clusters, mid, expect[0]))
-
-
-def closest_pair_strip(clusters, horiz_center, half_width):
-    """
-    Helper function to compute the closest pair of clusters in a vertical strip
-    """
-
-    def find(obj):
-        """
-        thank's for index
-        """
-        for idx in xrange(len(clusters)):
-            if clusters[idx] == obj:
-                return idx
-        return -1
-                
-    sub_clusters = [cls for cls in clusters if abs(cls.horiz_center() - horiz_center) < half_width]
-    sub_clusters.sort(key = lambda cluster: cluster.vert_center())
-    
-    cnt = len(sub_clusters)
-    min_d = (float('inf'), -1, -1)
-    idx1, idx2 = -1, -1 
-
-    for idx1 in xrange(cnt-1):
-        for idx2 in xrange(idx1+1, min(idx1+4, cnt)):
-            dist = pair_distance(sub_clusters, idx1, idx2)
-            min_d = min(min_d, dist)
-
-    if min_d[0] != float('inf'):    
-        idx1, idx2 = find(sub_clusters[min_d[1]]), find(sub_clusters[min_d[2]])
-        idx1, idx2 = min(idx1, idx2), max(idx1, idx2)
-        
-    return (min_d[0], idx1, idx2)     
-
-def slow_closest_pair_new(clusters):
     """
     Compute the distance between the closest pair of clusters in a list (slow)
     """
@@ -103,28 +28,28 @@ def slow_closest_pair_new(clusters):
 
 get_mid = lambda cls1, cls2 : (cls1.horiz_center() + cls2.horiz_center())/2.0
 
-def fast_closest_pair_new(xclusters, yclusters):
+def fast_closest_pair(xclusters, yclusters):
     """
     Compute the distance between the closest pair of clusters in a list (fast)
     """
     cnt = len(xclusters)
 
     if cnt <= 3:
-        return slow_closest_pair_new(xclusters)
+        return slow_closest_pair(xclusters)
     else:
 
         mid = cnt/2
         ys = [cls for cls in yclusters if cls.horiz_center() < xclusters[mid].horiz_center()]
         xs = [cls for cls in yclusters if cls.horiz_center() >= xclusters[mid].horiz_center()]
 
-        minl = fast_closest_pair_new(xclusters[:mid], ys)
-        minr = fast_closest_pair_new(xclusters[mid:], xs)
+        minl = fast_closest_pair(xclusters[:mid], ys)
+        minr = fast_closest_pair(xclusters[mid:], xs)
 
         expect = min(minl, minr)
        
-        return min(expect, closest_pair_strip_new(xclusters, yclusters, get_mid(xclusters[mid-1], xclusters[mid]), expect[0]))
+        return min(expect, closest_pair_strip(xclusters, yclusters, get_mid(xclusters[mid-1], xclusters[mid]), expect[0]))
 
-def closest_pair_strip_new(xclusters, yclusters, horiz_center, half_width):
+def closest_pair_strip(xclusters, yclusters, horiz_center, half_width):
     """
     Helper function to compute the closest pair of clusters in a vertical strip
     """
@@ -180,25 +105,7 @@ def insert_claster(clasters, foo, val):
         else:
             return clasters[:mid] + [val] + clasters[mid:]
         
-    
 def hierarchical_clustering(cluster_list, num_clusters):
-    """
-    Compute a hierarchical clustering of a set of clusters
-    """
-    clusters = [cls.copy() for cls in cluster_list]
-    clusters.sort(key = lambda cls: cls.horiz_center())
-
-    while len(clusters) > num_clusters:
-        min_cc = fast_closest_pair(clusters)
-        cls = clusters[min_cc[1]].merge_clusters(clusters[min_cc[2]])
-        del clusters[min_cc[2]]
-        del clusters[min_cc[1]]
-        clusters = insert_claster(clusters, compx, cls)
-        #clusters.sort(key = lambda cls: cls.horiz_center())
-
-    return clusters
-
-def hierarchical_clustering_new(cluster_list, num_clusters):
     """
     Compute a hierarchical clustering of a set of clusters
     """
@@ -207,7 +114,7 @@ def hierarchical_clustering_new(cluster_list, num_clusters):
     yclusters = sorted(xclusters, key = lambda cls: cls.vert_center())
 
     while len(xclusters) > num_clusters:
-        min_cc = fast_closest_pair_new(xclusters, yclusters)
+        min_cc = fast_closest_pair(xclusters, yclusters)
         cls1, cls2 = min_cc[1], min_cc[2] 
         new_cls = cls1.merge_clusters(cls2)
 
@@ -309,27 +216,30 @@ def gen_random_clusters(num_clusters):
 
     return clusters
 
-for _ in xrange(10):
 
-    _clusters = gen_random_clusters(500)
-    
-    ogxclusters = sorted(_clusters, key = lambda cluster: cluster.horiz_center())
+if __name__ == '__main__':
 
-    gxclusters = sorted(_clusters, key = lambda cluster: cluster.horiz_center())
-    gyclusters = sorted(_clusters, key = lambda cluster: cluster.vert_center())
+    for nn in xrange(100):
 
-    print 'go'
-    a = fast_closest_pair_new(gxclusters, gyclusters)
-    b = fast_closest_pair(ogxclusters)
+        _clusters = gen_random_clusters(200)
+        
+        ogxclusters = sorted(_clusters, key = lambda cluster: cluster.horiz_center())
 
-    #print a, b
-    assert a[0] == b[0]
+        gxclusters = sorted(_clusters, key = lambda cluster: cluster.horiz_center())
+        gyclusters = sorted(_clusters, key = lambda cluster: cluster.vert_center())
 
-    c = hierarchical_clustering_new(_clusters, 5)
-    d = hierarchical_clustering(_clusters, 5)
+        print 'go ' + str(nn)
+        a = fast_closest_pair(gxclusters, gyclusters)
+        b = old.fast_closest_pair(ogxclusters)
+        c = slow_closest_pair(ogxclusters)
 
-    for idx in xrange(len(c)):
-        assert c[idx].fips_codes()^d[idx].fips_codes() == set([])   
+        assert a[0] == b[0] == c[0]
+
+        c = hierarchical_clustering(_clusters, 50)
+        d = old.hierarchical_clustering(_clusters, 50)
+
+        for idx in xrange(len(c)):
+            assert c[idx].fips_codes()^d[idx].fips_codes() == set([])   
 
     
 
