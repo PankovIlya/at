@@ -1,6 +1,6 @@
 import random, math, sys
 import os
-SCRIPT_DIR =  os.path.dirname(os.path.realpath(__file__))
+SCRIPT_DIR = os.path.dirname(__file__)
 sys.path.append('%s/../degree_distributions_for_graphs' % SCRIPT_DIR)
 import ddg
 
