@@ -1,5 +1,8 @@
-import random, ddg, math
-
+import random, math, sys
+import os
+SCRIPT_DIR =  os.path.dirname(os.path.realpath(__file__))
+sys.path.append('%s/../degree_distributions_for_graphs' % SCRIPT_DIR)
+import ddg
 
 class UPATrial:
     """

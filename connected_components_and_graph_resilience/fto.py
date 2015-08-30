@@ -1,6 +1,11 @@
-import data, time
+import sys
 import connected_components as cc
+import load_data_cc as ldc
+import data, time
 
+#why not
+#import gc
+#gc.disable()
 
 def fast_targeted_order(ugraph):
     """
@@ -9,12 +14,14 @@ def fast_targeted_order(ugraph):
     O(n+m)
     """
     fgraph = cc.copy_graph(ugraph)
+
     
     sdegree = {}
     
     for node in xrange(len(fgraph)):
         sdegree[node] = set([])
        
+    
     for node in fgraph:
         cnt = len(ugraph[node])
         sdegree[cnt].add(node)
@@ -64,10 +71,9 @@ def time_run(ugraf, foo):
     foo(ugraf)
     return time.time() - ts
     
-    
-    
 
 if __name__ == "__main__":
+
     import sys
     sys.path.append('../degree_distributions_for_graphs')
     import upa as mupa

@@ -9,7 +9,7 @@ kmeans_clustering(cluster_list, num_clusters, num_iterations)
 
 """
 
-import math, random
+import sys, math, random
 import cluster as cl
 from itertools import combinations
 import old_clustering as old
@@ -105,6 +105,7 @@ def insert_claster(clasters, foo, val):
         else:
             return clasters[:mid] + [val] + clasters[mid:]
         
+
 def hierarchical_clustering(cluster_list, num_clusters):
     """
     Compute a hierarchical clustering of a set of clusters
@@ -114,15 +115,21 @@ def hierarchical_clustering(cluster_list, num_clusters):
     yclusters = sorted(xclusters, key = lambda cls: cls.vert_center())
 
     while len(xclusters) > num_clusters:
+        if not len(xclusters)%10:
+            # this is for you )
+            sys.stdout.flush()
+            print "\r processing {0}%".format(round((num_clusters*100.0/len(xclusters)),1)),
         min_cc = fast_closest_pair(xclusters, yclusters)
         cls1, cls2 = min_cc[1], min_cc[2] 
         new_cls = cls1.merge_clusters(cls2)
 
+        #Yes, but del a cluster of Y-clusters by index still does not work and del from list it's O(n)
         xclusters.remove(cls1)
         xclusters.remove(cls2)
+   
         yclusters.remove(cls1)
         yclusters.remove(cls2)
-        
+
         xclusters = insert_claster(xclusters, compx, new_cls)
         yclusters = insert_claster(yclusters, compy, new_cls)
         

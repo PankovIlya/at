@@ -1,7 +1,5 @@
 """ Connected components and graph resilience """
 import dsu as mdsu
-import data
-import urllib2
 import random
 
 
@@ -51,6 +49,7 @@ def compute_resilience (ugraph, attack_order):
         
     agraph = attack_order[::-1] 
     scc = cc_visited(rgraph)
+
     dsu = mdsu.DSU()
     for nodes in scc:
        head = nodes.pop() 
@@ -91,32 +90,6 @@ def compute_resilience_simple (ugraph, attack_order):
     return ccs
 
 
-
-def load_graph(graph_url):
-    """
-    Function that loads a graph given the URL
-    for a text representation of the graph
-    
-    Returns a dictionary that models a graph
-    """
-    #graph_file = urllib2.urlopen(graph_url)
-    graph_file = open("ccdata.txt")
-    graph_text = graph_file.read()
-    graph_lines = graph_text.split('\n')
-    graph_lines = graph_lines[ : -1]
-    
-    print "Loaded graph with", len(graph_lines), "nodes"
-    
-    answer_graph = {}
-    for line in graph_lines:
-        neighbors = line.split(' ')
-        node = int(neighbors[0])
-        answer_graph[node] = set([])
-        for neighbor in neighbors[1 : -1]:
-            answer_graph[node].add(int(neighbor))
-
-    return answer_graph
-
 def renum_keys(ugraph):
     ord_graph = {}
     idx = 0 
@@ -133,18 +106,20 @@ def renum_keys(ugraph):
 
     return res_graph
 
-net_url = "http://storage.googleapis.com/codeskulptor-alg/alg_rf7.txt"
 
 if __name__ == "__main__":
-    
+
+    import load_data_cc as ld
+    import data
+
     cr = compute_resilience(data.GRAPH2, [1, 3, 5, 7, 2, 4, 6, 8])
     assert ( cr ==  [8, 7, 6, 5, 1, 1, 1, 1, 0])
-    ugraph = load_graph(net_url)
+    ugraph = ld.load_graph(ld.GRAPH)
     print 'LOAD'
     atack = set([random.choice(ugraph.keys()) for _ in xrange(len(ugraph)//3)])
     atack = [x for x in atack]
     random.shuffle(atack)
-    assert (compute_resilience(ugraph, atack) == compute_resilience2(ugraph, atack))
+    assert (compute_resilience_simple(ugraph, atack) == compute_resilience(ugraph, atack))
 
     
 

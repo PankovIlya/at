@@ -4,40 +4,42 @@ import clustering as cl
 import old_clustering as old
 import math, random, time
 import matplotlib.pyplot as plt
+#import gc
+#gc.disable()
 
 
-def time_run(foo, clasters):
+def time_run(foo, args):
     ts = time.time()
-    foo(clasters)
-    return time.time() - ts
-
-def n_time_run(foo, xclasters, yclasters):
-    ts = time.time()
-    foo(xclasters, yclasters)
+    foo(*args)
     return time.time() - ts
 
 old_fast_closest_pair = []
 slow_closest_pair = []
 py_fast_closest_pair = []
 
-for nn in xrange(2, 201):
-    _clusters = cl.gen_random_clusters(nn)
+
+def trials (n):
+    slow_c, old_fc, py_fc = [], [], []
+
+    for nn in xrange(2, n):
+        _clusters = cl.gen_random_clusters(nn)
         
-    xclusters = sorted(_clusters, key = lambda cluster: cluster.horiz_center())
-    yclusters = sorted(_clusters, key = lambda cluster: cluster.vert_center())
+        xclusters = sorted(_clusters, key = lambda cluster: cluster.horiz_center())
+        yclusters = sorted(_clusters, key = lambda cluster: cluster.vert_center())
 
-    slow_closest_pair.append(time_run(cl.slow_closest_pair, xclusters))
-    old_fast_closest_pair.append(time_run(old.fast_closest_pair, xclusters))
-    py_fast_closest_pair.append(n_time_run(cl.fast_closest_pair, xclusters, yclusters))
+        slow_c.append(time_run(cl.slow_closest_pair, [xclusters]))
+        old_fc.append(time_run(old.fast_closest_pair, [xclusters]))
+        py_fc.append(time_run(cl.fast_closest_pair,
+                                           [xclusters, yclusters]))
+
+    return slow_c, old_fc, py_fc, range(2,n)
+
+old_fast_closest_pair, slow_closest_pair, py_fast_closest_pair, count = trials(200)
 
 
-count = xrange(2,201)
 plt.plot(count, slow_closest_pair, "r",  label='slow closest pair')
 plt.plot(count, old_fast_closest_pair, "b", label='fast closest pair')
 plt.plot(count, py_fast_closest_pair, "g", label="py's style fast closest pair with 'Y'")
-
-#title = 'Resilience of the graph, with random choice, n = {0} , p = {1}, m = {2}'.format(cnt, p, int(mx))
-#plt.title(title)
 
 plt.xlabel('number of clusters')
 plt.ylabel('running time, sec')

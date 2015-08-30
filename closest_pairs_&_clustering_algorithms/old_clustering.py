@@ -1,5 +1,5 @@
 """
-old style of owltest implement five functions:
+old style for owltest implement five functions:
 
 slow_closest_pair(cluster_list)
 fast_closest_pair(cluster_list)

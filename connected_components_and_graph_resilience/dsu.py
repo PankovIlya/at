@@ -56,9 +56,8 @@ class DSU (object):
             return head1
         
         if random.randint(0,1):
-            tmp = head1
-            head1 = head2
-            head2 = tmp
+            head1, head2 = head2, head1
+
 
         self._dsu[head2] = head1
         self._head[head1] += self._head[head2]

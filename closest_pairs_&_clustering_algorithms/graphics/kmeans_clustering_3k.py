@@ -1,10 +1,8 @@
-import load_clusters as lc
 import sys
 sys.path.append('../../closest_pairs_&_clustering_algorithms')
+import load_clusters as lc
 import clustering as clr
 import cluster as cl
-import old_clustering as old
-import plot_clusters as pc
 import alg_clusters_matplotlib as cplot
 
 
@@ -14,7 +12,6 @@ singleton_list = []
 for line in data_table:
     singleton_list.append(cl.Cluster(set([line[0]]), line[1], line[2], line[3], line[4]))
     
-#cluster_list = clr.hierarchical_clustering(singleton_list, 15)
 cluster_list = clr.kmeans_clustering(singleton_list, 15, 8)	
     
             
