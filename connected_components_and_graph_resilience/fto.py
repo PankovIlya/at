@@ -14,10 +14,9 @@ def fast_targeted_order(ugraph):
     O(n+m)
     """
     fgraph = cc.copy_graph(ugraph)
-
-    
+  
     sdegree = {}
-    
+       
     for node in xrange(len(fgraph)):
         sdegree[node] = set([])
        
@@ -36,7 +35,8 @@ def fast_targeted_order(ugraph):
                 if node in sdegree[cnt]:  
                     sdegree[cnt].remove(node)
                     sdegree[cnt-1].add(node)
-
+                    fgraph[node].remove(rnode)
+           
             rnodes.append(rnode)
 
     return rnodes
@@ -84,6 +84,15 @@ if __name__ == "__main__":
     toy = []
     ftoy = []
 
+##    for cnt in xrange(10,1000,10):
+##        cntx += [cnt]
+##        print cntx
+##        upa_graph = mupa.upa(5, cnt)
+##        toy = targeted_order(upa_graph)
+##        ftoy = fast_targeted_order(upa_graph)
+##        print toy, ftoy
+##        assert (toy == ftoy)
+        
     for cnt in xrange(10,1000,10):
         cntx += [cnt]
         upa_graph = mupa.upa(5, cnt)
