@@ -48,6 +48,34 @@ def find_ng (checked_word, ng_dict, distance):
     best.sort(reverse=True)        
     return best
 
+def find_ng_l (checked_word, ng_dict):
+    """ create ngramms of checked_word
+        find in ngramms dict
+        calc levenshtein distance
+    """
+    
+    in_ng_dict = set([])
+    best = []
+
+    ngramms = get_ngramms3(checked_word)
+    
+    for ng in ngramms:
+        in_ng_dict = in_ng_dict | ng_dict.get(ng, set([]))
+
+    print "number of words after find ngramms" + str(len(in_ng_dict))
+        
+    for word in in_ng_dict:
+        # realy levenshtein distance
+        score = ca.levenshtein_distance(checked_word, word)
+
+        heapq.heappush(best, (1.0/(score + 1), word))
+        if len(best) > 5:
+            heapq.heappop(best)
+
+
+    best.sort(reverse=True)        
+    return best
+
 if __name__ == "__main__":
 
     import time
@@ -58,14 +86,19 @@ if __name__ == "__main__":
     _alphabet = 'qwertyuiopasdfghjklzxcvbnm'
     
     ng_dict = dict_ngramms(dictionary)
-    levenshtein_distance = ca.build_scoring_matrix(_alphabet, 2, 1, 0)
+    m_levenshtein_distance = ca.build_scoring_matrix(_alphabet, 2, 1, 0)
 
     def runtimes(check_word, correct_word):
+        print 'global alignment for levenstein'
         print 'check word "' + check_word + '" correct word "' + correct_word + '"'
         t = time.time()
-        print 'top 5', find_ng(check_word, ng_dict, levenshtein_distance)
+        print 'O(n^2) top 5', find_ng(check_word, ng_dict, m_levenshtein_distance)
+        print 'running time', time.time() - t
+        t = time.time()
+        print 'O(n) top 5', find_ng_l(check_word, ng_dict)
         print 'running time', time.time() - t
         print \
+        
 
     runtimes('codok', 'cotok')
     runtimes('wirefqlye', 'firefly') 

@@ -66,6 +66,38 @@ def compute_alignment_matrix(seq_x, seq_y, scoring_matrix, global_flag):
             
     return cam
 
+def levenshtein_distance(seq_x, seq_y):
+    """ compute global or local alignment matrix """
+
+    cam = [0] 
+
+        
+    if seq_x < seq_y:
+        seq_x, seq_y = seq_y, seq_x 
+
+    lx, ly = len(seq_x), len(seq_y)
+
+    for j in xrange(1, ly+1):
+        cam.append(j)
+
+    change = lambda a, b:  0 if a == b else 1
+
+    for i in xrange(1, lx+1):
+        current = [i]
+        for j in xrange(1, ly+1):
+            cxy = cam[j-1] + change(seq_x[i-1], seq_y[j-1]) 
+            cx_ = current[j-1] + 1
+            c_y = cam[j] +1
+
+            score = min([cxy, cx_, c_y])
+
+            current.append(score)
+
+        cam = current
+            
+    return cam[ly]
+
+
 def compute_global_alignment(seq_x, seq_y, scoring_matrix, alignment_matrix):
     """compute global alignment """ 
     idx, idy = len(seq_x), len(seq_y)
@@ -169,12 +201,12 @@ if __name__ == "__main__":
     print g_matrix
     print compute_global_alignment('AA','TA', scores, g_matrix)
 
-    a, b = 'BBAAYYY', 'CABCAADFGI' 
-    levenshtein_distance = build_scoring_matrix(set(a+b), 2, 1, 0)
-    lg_matrix = compute_alignment_matrix(a,b, levenshtein_distance, True)
-    global_levenshtein = compute_global_alignment(a,b, levenshtein_distance, lg_matrix)
+    a, b = 'BBAAYYY', 'BSBSAYY' 
+    m_levenshtein_distance = build_scoring_matrix(set(a+b), 2, 1, 0)
+    lg_matrix = compute_alignment_matrix(a,b, m_levenshtein_distance, True)
+    global_levenshtein = compute_global_alignment(a,b, m_levenshtein_distance, lg_matrix)
     print global_levenshtein, len(a), len(b), len(a) + len(b) - global_levenshtein[0]
-
+    print levenshtein_distance(a, b)
 
 
 
