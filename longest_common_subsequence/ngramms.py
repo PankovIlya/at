@@ -79,6 +79,8 @@ def find_ng_l (checked_word, ng_dict):
 if __name__ == "__main__":
 
     import time
+    import gc
+    gc.disable()
 
     dictionary = set(ld.read_words(ld.WORD_LIST_URL))
     dictionary.add('cotok')
