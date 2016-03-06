@@ -1,0 +1,11 @@
+Analysis of a computer network
+
+An example computer network - The text representation for the example network is here (1239 nodes and 3047 edges). 
+
+ER graphs - ER undirected graphs.
+
+UPA graphs - undirected UPA graphs. UPATrial class.
+
+To begin our analysis, we will examine the resilience of the computer network under an attack in which servers are chosen at random and using fast targeted order
+
+
